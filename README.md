@@ -4,12 +4,12 @@ A famous quote quiz game where players guess the author of displayed quotes. Sup
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React 18, TypeScript, Bootstrap 5, React Router 6 |
-| Backend | ASP.NET Core Web API (.NET 8), Entity Framework Core |
-| Database | SQLite (file-based, no server required) |
-| Testing | NUnit + Moq (backend), Vitest + React Testing Library (frontend) |
+| Layer    | Technology                                                       |
+| -------- | ---------------------------------------------------------------- |
+| Frontend | React 18, TypeScript, Bootstrap 5, React Router 6                |
+| Backend  | ASP.NET Core Web API (.NET 8), Entity Framework Core             |
+| Database | SQLite (file-based, no server required)                          |
+| Testing  | NUnit + Moq (backend), Vitest + React Testing Library (frontend) |
 
 ---
 
@@ -42,6 +42,8 @@ quote-quiz-game/
 ---
 
 ## Setup
+
+**For your ease, you can directly run the single-step setup script `scripts/start-all.ps1` or execute the steps below manually.**
 
 ### 1. Apply database migrations
 
@@ -156,11 +158,11 @@ npm run build
 
 The `scripts/` directory contains PowerShell helpers for Windows. Run them from the repo root or from within the `scripts/` folder — they resolve paths relative to their own location.
 
-| Script | What it does |
-|---|---|
+| Script          | What it does                                                                                                                                                           |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `start-all.ps1` | **One-command startup.** Opens the backend in a new window (applies migrations first), waits for the backend health endpoint, then opens the frontend in a new window. |
-| `start-be.ps1` | Applies EF Core migrations then starts the backend on `http://localhost:5000`. |
-| `start-fe.ps1` | Waits up to 30 s for the backend health endpoint, runs `npm install` if `node_modules` is missing, then starts the frontend dev server on `http://localhost:3000`. |
+| `start-be.ps1`  | Applies EF Core migrations then starts the backend on `http://localhost:5000`.                                                                                         |
+| `start-fe.ps1`  | Waits up to 30 s for the backend health endpoint, runs `npm install` if `node_modules` is missing, then starts the frontend dev server on `http://localhost:3000`.     |
 
 ### Recommended usage
 
@@ -186,9 +188,9 @@ This opens separate terminal windows for the backend and frontend. You can close
 
 ## Game Modes
 
-| Mode | Description |
-|---|---|
-| **Binary** | A quote and an author name are shown. Answer Yes or No: did this author say this quote? |
-| **Multiple Choice** | A quote is shown with 4 author options. Pick the correct one. |
+| Mode                | Description                                                                             |
+| ------------------- | --------------------------------------------------------------------------------------- |
+| **Binary**          | A quote and an author name are shown. Answer Yes or No: did this author say this quote? |
+| **Multiple Choice** | A quote is shown with 4 author options. Pick the correct one.                           |
 
 Mode preference is saved to `localStorage` and persists across sessions.
