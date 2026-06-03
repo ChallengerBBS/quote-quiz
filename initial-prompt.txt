@@ -1,0 +1,10 @@
+Read requirements.pdf
+Propose me a solution using the following tech stack:
+ASP.NET Web api (with controllers) for backend service
+React (latest version) with TypeScript for Frontend
+HTML5/CSS3
+Postgresql hosted in docker container using docker-compose.
+
+Libraries - Bootstrap, NUnit + Moq (for BE tests), jest (for FE tests)
+The solution that you propose should give example of folder structure and db schema.
+The second page is a design that has to be followed.
