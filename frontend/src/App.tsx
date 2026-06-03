@@ -16,7 +16,7 @@ import CreateUserPage from './pages/CreateUserPage';
 const App: React.FC = () => {
   return (
     <GameProvider>
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <NavBar />
         <main>
           <Routes>

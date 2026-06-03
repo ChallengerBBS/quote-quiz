@@ -10,7 +10,7 @@ A famous quote quiz game where players guess the author of displayed quotes. Sup
 | Backend | ASP.NET Core Web API (.NET 8), Entity Framework Core |
 | Database | PostgreSQL 16 |
 | Infrastructure | Docker + Docker Compose |
-| Testing | NUnit + Moq (backend), Jest + React Testing Library (frontend) |
+| Testing | NUnit + Moq (backend), Vitest + React Testing Library (frontend) |
 
 ---
 
@@ -148,7 +148,7 @@ npm test
 Run a single test file:
 
 ```bash
-npm test -- --testPathPattern=FileName
+npm test -- FileName
 ```
 
 ---

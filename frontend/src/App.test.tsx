@@ -2,23 +2,22 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-// Mock the api module to prevent actual HTTP calls during tests
-jest.mock('./services/api', () => ({
-  createUser: jest.fn().mockResolvedValue({ id: 1, username: 'Guest', createdAt: '' }),
-  getQuestion: jest.fn().mockResolvedValue({
+vi.mock('./services/api', () => ({
+  createUser: vi.fn().mockResolvedValue({ id: 1, username: 'Guest', createdAt: '' }),
+  getQuestion: vi.fn().mockResolvedValue({
     quoteId: 1,
     quoteText: 'Test quote',
     proposedAuthor: 'Test Author',
     options: null,
   }),
-  submitAnswer: jest.fn().mockResolvedValue({ isCorrect: true, correctAuthor: 'Test Author' }),
-  getAchievements: jest.fn().mockResolvedValue([]),
+  submitAnswer: vi.fn().mockResolvedValue({ isCorrect: true, correctAuthor: 'Test Author' }),
+  getAchievements: vi.fn().mockResolvedValue([]),
 }));
 
 describe('App smoke test', () => {
   test('renders the navbar', () => {
     render(<App />);
-    expect(screen.getByText('Quiz Quiz', { exact: false }) || screen.getByText('Quiz')).toBeTruthy();
+    expect(screen.getByText('Quote Quiz', { exact: false })).toBeInTheDocument();
   });
 
   test('navbar contains Quiz link', () => {
