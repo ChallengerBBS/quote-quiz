@@ -21,12 +21,16 @@ public static class SeedData
         if (context.Users.Any())
             return;
 
-        context.Users.Add(new User
-        {
-            Id = 1,
-            Username = "Guest",
-            CreatedAt = DateTime.UtcNow
-        });
+        context.Users.AddRange(
+            new User
+            {
+                Id = 1337,
+                Username = "Administrator",
+                IsAdmin = true,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            }
+        );
 
         context.SaveChanges();
     }
