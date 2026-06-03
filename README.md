@@ -8,24 +8,22 @@ A famous quote quiz game where players guess the author of displayed quotes. Sup
 |---|---|
 | Frontend | React 18, TypeScript, Bootstrap 5, React Router 6 |
 | Backend | ASP.NET Core Web API (.NET 8), Entity Framework Core |
-| Database | PostgreSQL 16 |
-| Infrastructure | Docker + Docker Compose |
+| Database | SQLite (file-based, no server required) |
 | Testing | NUnit + Moq (backend), Vitest + React Testing Library (frontend) |
 
 ---
 
 ## Prerequisites
 
-Make sure the following are installed before setting up the project:
-
 - [Node.js](https://nodejs.org/) v18 or later (includes npm)
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for PostgreSQL)
 - [dotnet-ef CLI tool](https://learn.microsoft.com/en-us/ef/core/cli/dotnet) — install once globally:
 
 ```bash
 dotnet tool install --global dotnet-ef
 ```
+
+No Docker or database server needed — SQLite stores everything in a single file (`quotequiz.db`) created automatically on first run.
 
 ---
 
@@ -38,7 +36,6 @@ quote-quiz-game/
 │   ├── QuoteQuiz.API/     # ASP.NET Core Web API (port 5000)
 │   └── QuoteQuiz.Tests/   # NUnit test project
 ├── scripts/           # Utility scripts
-├── docker-compose.yml # PostgreSQL container
 └── README.md
 ```
 
@@ -46,27 +43,7 @@ quote-quiz-game/
 
 ## Setup
 
-### 1. Start the database
-
-```bash
-docker-compose up -d
-```
-
-This starts a PostgreSQL 16 container on port **5432** with:
-
-| Setting | Value |
-|---|---|
-| Database | `quotequiz` |
-| Username | `quotequiz` |
-| Password | `quotequiz123` |
-
-Verify it's healthy:
-
-```bash
-docker-compose ps
-```
-
-### 2. Apply database migrations
+### 1. Apply database migrations
 
 From the `backend/` directory:
 
@@ -75,11 +52,9 @@ cd backend
 dotnet ef database update --project QuoteQuiz.API
 ```
 
-This creates all tables with the initial schema. User IDs auto-increment starting from **1338**.
-First user that is already seeded has id **1337** and has admin priviliges.
-In order to access this admin profile all you have to do is to change your id in localStorage to **1337**.
+This creates `quotequiz.db` in the `QuoteQuiz.API` folder with all tables and seed data. User IDs auto-increment starting from **1338**. The pre-seeded admin account has ID **1337** — set your `id` in `localStorage` to `1337` to access it.
 
-### 3. Start the backend API
+### 2. Start the backend API
 
 ```bash
 cd backend
@@ -88,14 +63,14 @@ dotnet run --project QuoteQuiz.API
 
 The API will be available at `http://localhost:5000`.
 
-### 4. Install frontend dependencies
+### 3. Install frontend dependencies
 
 ```bash
 cd frontend
 npm install
 ```
 
-### 5. Start the frontend dev server
+### 4. Start the frontend dev server
 
 ```bash
 npm start
@@ -113,13 +88,15 @@ On first load the app will redirect you to a **Create Profile** page. Enter a us
 
 ## Environment & Configuration
 
-The backend connection string is in `backend/QuoteQuiz.API/appsettings.json` and matches the Docker Compose defaults out of the box. To use a different database, update the `DefaultConnection` value:
+The SQLite database path is set in `backend/QuoteQuiz.API/appsettings.json`:
 
 ```json
 "ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Database=quotequiz;Username=quotequiz;Password=quotequiz123"
+  "DefaultConnection": "Data Source=quotequiz.db"
 }
 ```
+
+The path is relative to the working directory when the app runs. To use an absolute path or a different location, update this value.
 
 ---
 
@@ -156,15 +133,17 @@ npm test -- FileName
 ## Common Commands
 
 ```bash
-# Stop the database container
-docker-compose down
-
-# Stop and wipe all database data
-docker-compose down -v
-
 # Add a new EF Core migration
 cd backend
 dotnet ef migrations add <MigrationName> --project QuoteQuiz.API
+
+# Apply pending migrations
+cd backend
+dotnet ef database update --project QuoteQuiz.API
+
+# Reset the database (delete the file and re-apply)
+rm backend/QuoteQuiz.API/quotequiz.db
+cd backend && dotnet ef database update --project QuoteQuiz.API
 
 # Production frontend build
 cd frontend
@@ -179,9 +158,8 @@ The `scripts/` directory contains PowerShell helpers for Windows. Run them from 
 
 | Script | What it does |
 |---|---|
-| `start-all.ps1` | **One-command startup.** Starts the DB, waits for it to be healthy, opens the backend in a new window (applies migrations first), waits for the backend health endpoint, then opens the frontend in a new window. |
-| `start-db.ps1` | Runs `docker-compose up -d` and polls until PostgreSQL is healthy. Pass `-KeepAlive` to keep the container running in the foreground — pressing Enter will `docker-compose down` cleanly. |
-| `start-be.ps1` | Applies EF Core migrations then starts the backend on `http://localhost:5000`. Pass `-SkipDb` to skip the database startup step (useful when the DB is already running). |
+| `start-all.ps1` | **One-command startup.** Opens the backend in a new window (applies migrations first), waits for the backend health endpoint, then opens the frontend in a new window. |
+| `start-be.ps1` | Applies EF Core migrations then starts the backend on `http://localhost:5000`. |
 | `start-fe.ps1` | Waits up to 30 s for the backend health endpoint, runs `npm install` if `node_modules` is missing, then starts the frontend dev server on `http://localhost:3000`. |
 
 ### Recommended usage
@@ -192,18 +170,15 @@ The `scripts/` directory contains PowerShell helpers for Windows. Run them from 
 .\scripts\start-all.ps1
 ```
 
-This opens separate terminal windows for the database, backend, and frontend. You can close the launcher window once all three are running.
+This opens separate terminal windows for the backend and frontend. You can close the launcher window once both are running.
 
 **Start services individually (useful for development):**
 
 ```powershell
-# Terminal 1 — database
-.\scripts\start-db.ps1 -KeepAlive
+# Terminal 1 — backend
+.\scripts\start-be.ps1
 
-# Terminal 2 — backend (skips re-starting the DB)
-.\scripts\start-be.ps1 -SkipDb
-
-# Terminal 3 — frontend
+# Terminal 2 — frontend
 .\scripts\start-fe.ps1
 ```
 

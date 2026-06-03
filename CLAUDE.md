@@ -9,9 +9,8 @@ A famous quote quiz game where users guess the author of displayed quotes. Suppo
 ## Tech Stack
 
 - **Frontend**: React + TypeScript, Bootstrap for styling, Jest for tests
-- **Backend**: ASP.NET Core Web API (Controllers pattern), Entity Framework Core, PostgreSQL
+- **Backend**: ASP.NET Core Web API (Controllers pattern), Entity Framework Core, SQLite
 - **Testing**: NUnit + Moq (backend), Jest (frontend)
-- **Infrastructure**: Docker + Docker Compose for PostgreSQL
 
 ## Commands
 

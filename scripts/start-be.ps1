@@ -1,16 +1,5 @@
-param([switch]$SkipDb)
-
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $BackendDir = Join-Path $ScriptDir '..\backend'
-
-if (-not $SkipDb) {
-    & "$ScriptDir\start-db.ps1"
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "`nPress Enter to close..."
-        $null = Read-Host
-        exit $LASTEXITCODE
-    }
-}
 
 Write-Host "Applying EF Core migrations..."
 Push-Location $BackendDir

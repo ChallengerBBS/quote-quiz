@@ -1,20 +1,10 @@
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Compose = Join-Path $ScriptDir '..\docker-compose.yml'
 
-# 1. Start DB and wait until healthy (inline — fast, no window needed yet)
-Write-Host "Starting PostgreSQL..."
-& "$ScriptDir\start-db.ps1"
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-# 2. Open DB window (keeps the container alive; closing it stops PostgreSQL)
-Write-Host "Opening database window..."
-$DbProc = Start-Process pwsh -ArgumentList "-NoExit", "-File", "$ScriptDir\start-db.ps1", "-KeepAlive" -PassThru
-
-# 3. Open BE window (DB is already up, so skip the DB step inside start-be)
+# 1. Open BE window (applies migrations then starts the API)
 Write-Host "Opening backend window..."
-$BeProc = Start-Process pwsh -ArgumentList "-NoExit", "-File", "$ScriptDir\start-be.ps1", "-SkipDb" -PassThru
+$BeProc = Start-Process pwsh -ArgumentList "-NoExit", "-File", "$ScriptDir\start-be.ps1" -PassThru
 
-# 4. Poll backend health (up to 90 s)
+# 2. Poll backend health (up to 90 s)
 Write-Host "Waiting for backend to be ready..."
 $retries = 45
 while ($true) {
@@ -37,7 +27,7 @@ while ($true) {
 }
 Write-Host "Backend is ready."
 
-# 5. Open FE window
+# 3. Open FE window
 Write-Host "Opening frontend window..."
 $FeProc = Start-Process pwsh -ArgumentList "-NoExit", "-File", "$ScriptDir\start-fe.ps1" -PassThru
 
