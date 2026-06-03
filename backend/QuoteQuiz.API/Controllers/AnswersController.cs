@@ -27,6 +27,10 @@ public class AnswersController : ControllerBase
             var result = await _answerService.SubmitAnswerAsync(dto);
             return Ok(result);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = ex.Message });
+        }
         catch (KeyNotFoundException ex)
         {
             return NotFound(new { error = ex.Message });

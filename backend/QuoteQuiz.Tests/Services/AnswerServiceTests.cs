@@ -38,6 +38,7 @@ public class AnswerServiceTests
         {
             Id = UserId,
             Username = "TestUser",
+            IsActive = true,
             CreatedAt = DateTime.UtcNow
         });
 
@@ -253,5 +254,76 @@ public class AnswerServiceTests
 
         Assert.ThrowsAsync<ArgumentException>(
             async () => await _service.SubmitAnswerAsync(dto));
+    }
+
+    // ----- IsActive enforcement tests -----
+
+    [Test]
+    public void SubmitAnswer_DisabledUser_ThrowsUnauthorizedAccessException()
+    {
+        _context.Users.Add(new User
+        {
+            Id = 99,
+            Username = "DisabledUser",
+            IsActive = false,
+            CreatedAt = DateTime.UtcNow
+        });
+        _context.SaveChanges();
+
+        var dto = new AnswerSubmitDto(
+            UserId: 99,
+            QuoteId: QuoteId,
+            Mode: "multiple-choice",
+            ProposedAuthor: null,
+            BinaryAnswer: null,
+            SelectedAuthor: CorrectAuthor
+        );
+
+        Assert.ThrowsAsync<UnauthorizedAccessException>(
+            async () => await _service.SubmitAnswerAsync(dto));
+    }
+
+    [Test]
+    public void SubmitAnswer_DisabledUser_DoesNotSaveAnswer()
+    {
+        _context.Users.Add(new User
+        {
+            Id = 99,
+            Username = "DisabledUser",
+            IsActive = false,
+            CreatedAt = DateTime.UtcNow
+        });
+        _context.SaveChanges();
+
+        var dto = new AnswerSubmitDto(
+            UserId: 99,
+            QuoteId: QuoteId,
+            Mode: "multiple-choice",
+            ProposedAuthor: null,
+            BinaryAnswer: null,
+            SelectedAuthor: CorrectAuthor
+        );
+
+        Assert.ThrowsAsync<UnauthorizedAccessException>(
+            async () => await _service.SubmitAnswerAsync(dto));
+
+        Assert.That(_context.UserAnswers.Any(), Is.False);
+    }
+
+    [Test]
+    public async Task SubmitAnswer_ActiveUser_Succeeds()
+    {
+        var dto = new AnswerSubmitDto(
+            UserId: UserId,
+            QuoteId: QuoteId,
+            Mode: "multiple-choice",
+            ProposedAuthor: null,
+            BinaryAnswer: null,
+            SelectedAuthor: CorrectAuthor
+        );
+
+        var result = await _service.SubmitAnswerAsync(dto);
+
+        Assert.That(result.IsCorrect, Is.True);
     }
 }

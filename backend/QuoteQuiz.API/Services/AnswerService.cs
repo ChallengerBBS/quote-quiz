@@ -16,9 +16,11 @@ public class AnswerService : IAnswerService
 
     public async Task<AnswerResultDto> SubmitAnswerAsync(AnswerSubmitDto dto)
     {
-        var userExists = await _context.Users.AnyAsync(u => u.Id == dto.UserId);
-        if (!userExists)
-            throw new KeyNotFoundException($"User {dto.UserId} not found.");
+        var user = await _context.Users.FindAsync(dto.UserId)
+            ?? throw new KeyNotFoundException($"User {dto.UserId} not found.");
+
+        if (!user.IsActive)
+            throw new UnauthorizedAccessException($"User {dto.UserId} is disabled.");
 
         var quote = await _context.Quotes.FindAsync(dto.QuoteId)
             ?? throw new KeyNotFoundException($"Quote {dto.QuoteId} not found.");

@@ -8,6 +8,7 @@ interface GameContextValue {
   userId: number | null;
   setUserId: (id: number | null) => void;
   isAdmin: boolean;
+  isActive: boolean;
   isAdminLoading: boolean;
   refreshCurrentUser: () => Promise<void>;
 }
@@ -39,6 +40,7 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
   });
 
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isActive, setIsActive] = useState(true);
   const [isAdminLoading, setIsAdminLoading] = useState(true);
 
   const setMode = (newMode: GameMode) => {
@@ -64,9 +66,11 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
     try {
       const user = await getUserById(userId);
       setIsAdmin(user.isAdmin);
+      setIsActive(user.isActive);
     } catch {
       // User no longer exists (e.g. DB was reset) — clear stale ID and let the app redirect to create-user
       setIsAdmin(false);
+      setIsActive(true);
       setUserId(null);
     } finally {
       setIsAdminLoading(false);
@@ -79,13 +83,14 @@ export const GameProvider: React.FC<GameProviderProps> = ({ children }) => {
       refreshCurrentUser();
     } else {
       setIsAdmin(false);
+      setIsActive(true);
       setIsAdminLoading(false);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   return (
-    <GameContext.Provider value={{ mode, setMode, userId, setUserId, isAdmin, isAdminLoading, refreshCurrentUser }}>
+    <GameContext.Provider value={{ mode, setMode, userId, setUserId, isAdmin, isActive, isAdminLoading, refreshCurrentUser }}>
       {children}
     </GameContext.Provider>
   );
