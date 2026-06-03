@@ -173,6 +173,42 @@ npm run build
 
 ---
 
+## PowerShell Scripts
+
+The `scripts/` directory contains PowerShell helpers for Windows. Run them from the repo root or from within the `scripts/` folder — they resolve paths relative to their own location.
+
+| Script | What it does |
+|---|---|
+| `start-all.ps1` | **One-command startup.** Starts the DB, waits for it to be healthy, opens the backend in a new window (applies migrations first), waits for the backend health endpoint, then opens the frontend in a new window. |
+| `start-db.ps1` | Runs `docker-compose up -d` and polls until PostgreSQL is healthy. Pass `-KeepAlive` to keep the container running in the foreground — pressing Enter will `docker-compose down` cleanly. |
+| `start-be.ps1` | Applies EF Core migrations then starts the backend on `http://localhost:5000`. Pass `-SkipDb` to skip the database startup step (useful when the DB is already running). |
+| `start-fe.ps1` | Waits up to 30 s for the backend health endpoint, runs `npm install` if `node_modules` is missing, then starts the frontend dev server on `http://localhost:3000`. |
+
+### Recommended usage
+
+**Start everything at once (simplest):**
+
+```powershell
+.\scripts\start-all.ps1
+```
+
+This opens separate terminal windows for the database, backend, and frontend. You can close the launcher window once all three are running.
+
+**Start services individually (useful for development):**
+
+```powershell
+# Terminal 1 — database
+.\scripts\start-db.ps1 -KeepAlive
+
+# Terminal 2 — backend (skips re-starting the DB)
+.\scripts\start-be.ps1 -SkipDb
+
+# Terminal 3 — frontend
+.\scripts\start-fe.ps1
+```
+
+---
+
 ## Game Modes
 
 | Mode | Description |
